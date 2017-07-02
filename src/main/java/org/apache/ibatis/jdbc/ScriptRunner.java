@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2015 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
 
 /**
@@ -34,9 +35,10 @@ public class ScriptRunner {
 
   private static final String DEFAULT_DELIMITER = ";";
 
-  private Connection connection;
+  private final Connection connection;
 
   private boolean stopOnError;
+  private boolean throwWarning;
   private boolean autoCommit;
   private boolean sendFullScript;
   private boolean removeCRs;
@@ -46,7 +48,7 @@ public class ScriptRunner {
   private PrintWriter errorLogWriter = new PrintWriter(System.err);
 
   private String delimiter = DEFAULT_DELIMITER;
-  private boolean fullLineDelimiter = false;
+  private boolean fullLineDelimiter;
 
   public ScriptRunner(Connection connection) {
     this.connection = connection;
@@ -54,6 +56,10 @@ public class ScriptRunner {
 
   public void setStopOnError(boolean stopOnError) {
     this.stopOnError = stopOnError;
+  }
+
+  public void setThrowWarning(boolean throwWarning) {
+    this.throwWarning = throwWarning;
   }
 
   public void setAutoCommit(boolean autoCommit) {
@@ -227,6 +233,14 @@ public class ScriptRunner {
     }
     if (stopOnError) {
       hasResults = statement.execute(sql);
+      if (throwWarning) {
+        // In Oracle, CRATE PROCEDURE, FUNCTION, etc. returns warning
+        // instead of throwing exception if there is compilation error.
+        SQLWarning warning = statement.getWarnings();
+        if (warning != null) {
+          throw warning;
+        }
+      }
     } else {
       try {
         hasResults = statement.execute(sql);

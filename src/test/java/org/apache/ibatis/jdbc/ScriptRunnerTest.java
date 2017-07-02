@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2015 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ public class ScriptRunnerTest extends BaseDataTest {
     runner.setStopOnError(false);
     runner.setErrorLogWriter(null);
     runner.setLogWriter(null);
+    conn.close();
     runJPetStoreScripts(runner);
     assertProductsTableExistsAndLoaded();
   }
@@ -63,6 +64,7 @@ public class ScriptRunnerTest extends BaseDataTest {
     runner.setErrorLogWriter(null);
     runner.setLogWriter(null);
     runJPetStoreScripts(runner);
+    conn.close();
     assertProductsTableExistsAndLoaded();
   }
 
@@ -102,6 +104,8 @@ public class ScriptRunnerTest extends BaseDataTest {
     } catch (Exception e) {
       assertTrue(e.getMessage().contains("end-of-line terminator"));
     }
+    reader.close();
+    conn.close();
   }
 
   @Test
@@ -123,6 +127,8 @@ public class ScriptRunnerTest extends BaseDataTest {
     } catch (Exception e) {
       fail(e.getMessage());
     }
+    reader.close();
+    conn.close();
   }
 
   @Test
@@ -144,6 +150,8 @@ public class ScriptRunnerTest extends BaseDataTest {
     } catch (Exception e) {
       assertTrue(e.getMessage().contains("end-of-line terminator"));
     }
+    reader.close();
+    conn.close();
   }
 
   @Test
@@ -165,6 +173,8 @@ public class ScriptRunnerTest extends BaseDataTest {
     } catch (Exception e) {
       fail(e.getMessage());
     }
+    reader.close();
+    conn.close();
   }
 
   @Test
@@ -182,8 +192,12 @@ public class ScriptRunnerTest extends BaseDataTest {
 
     Reader reader = new StringReader("select userid from account where userid = 'j2ee';");
     runner.runScript(reader);
+    conn.close();
 
-    assertEquals("select userid from account where userid = 'j2ee'\n\nUSERID\t\nj2ee\t\n", sw.toString());
+    assertEquals(
+            "select userid from account where userid = 'j2ee'" + System.getProperty("line.separator")
+                    + System.getProperty("line.separator") + "USERID\t" + System.getProperty("line.separator")
+                    + "j2ee\t" + System.getProperty("line.separator"), sw.toString());
   }
 
   @Test
@@ -201,8 +215,12 @@ public class ScriptRunnerTest extends BaseDataTest {
 
     Reader reader = new StringReader("select userid from account where userid = 'j2ee';");
     runner.runScript(reader);
+    conn.close();
 
-    assertEquals("select userid from account where userid = 'j2ee';\n\nUSERID\t\nj2ee\t\n", sw.toString());
+    assertEquals(
+            "select userid from account where userid = 'j2ee';" + System.getProperty("line.separator")
+                    + System.getProperty("line.separator") + "USERID\t" + System.getProperty("line.separator")
+                    + "j2ee\t" + System.getProperty("line.separator"), sw.toString());
   }
 
   private void runJPetStoreScripts(ScriptRunner runner) throws IOException, SQLException {
@@ -217,6 +235,7 @@ public class ScriptRunnerTest extends BaseDataTest {
       SqlRunner executor = new SqlRunner(conn);
       List<Map<String, Object>> products = executor.selectAll("SELECT * FROM PRODUCT");
       assertEquals(16, products.size());
+      conn.close();
     } finally {
       ds.forceCloseAll();
     }

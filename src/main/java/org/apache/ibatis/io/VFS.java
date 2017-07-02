@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2015 the original author or authors.
+ *    Copyright 2009-2016 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import org.apache.ibatis.logging.LogFactory;
  * @author Ben Gunter
  */
 public abstract class VFS {
-  private static final Log log = LogFactory.getLog(ResolverUtil.class);
+  private static final Log log = LogFactory.getLog(VFS.class);
 
   /** The built-in implementations. */
   public static final Class<?>[] IMPLEMENTATIONS = { JBoss6VFS.class, DefaultVFS.class };
@@ -142,7 +142,7 @@ public abstract class VFS {
    * @param parameters The parameters to pass to the method.
    * @return Whatever the method returns.
    * @throws IOException If I/O errors occur
-   * @throws StripesRuntimeException If anything else goes wrong
+   * @throws RuntimeException If anything else goes wrong
    */
   @SuppressWarnings("unchecked")
   protected static <T> T invoke(Method method, Object object, Object... parameters)

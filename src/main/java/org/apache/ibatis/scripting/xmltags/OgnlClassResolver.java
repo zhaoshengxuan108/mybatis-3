@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2015 the original author or authors.
+ *    Copyright 2009-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,15 +26,14 @@ import org.apache.ibatis.io.Resources;
  * Custom ognl {@code ClassResolver} which behaves same like ognl's
  * {@code DefaultClassResolver}. But uses the {@code Resources}
  * utility class to find the target class instead of {@code Class#forName(String)}. 
- * 
- * @see https://github.com/mybatis/mybatis-3/issues/161
- * 
- * @author Daniel Guggi
- * 
+ *
+ * @author Daniel Guggi 
+ *
+ * @see <a href='https://github.com/mybatis/mybatis-3/issues/161'>Issue 161</a>
  */
 public class OgnlClassResolver implements ClassResolver {
 
-  private Map<String, Class<?>> classes = new HashMap<String, Class<?>>(101);
+  private final Map<String, Class<?>> classes = new HashMap<String, Class<?>>(101);
 
   @Override
   public Class classForName(String className, Map context) throws ClassNotFoundException {
